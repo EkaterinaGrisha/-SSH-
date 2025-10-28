@@ -1,0 +1,34 @@
+nano tmux_setup.sh
+
+#!/bin/bash
+
+# Управление сеансами SSH с помощью tmux
+echo "=== Установка и настройка tmux ==="
+
+# Запрос данных для подключения
+read -p "Введите имя пользователя: " username
+read -p "Введите IP-адрес сервера: " ip_address
+
+# Устанавливаем tmux на удаленном сервере
+echo "1. Устанавливаем tmux на удаленном сервере..."
+ssh $username@$ip_address "sudo apt update && sudo apt install tmux -y"
+
+# Создаем сеанс tmux и запускаем долгосрочную задачу
+echo "2. Создаем сеанс tmux с долгосрочной задачей..."
+ssh $username@$ip_address "tmux new-session -d -s mysession 'while true; do echo \"Сеанс активен: \$(date)\" >> /tmp/long_task.log; sleep 10; done'"
+
+# Проверяем создание сеанса
+echo "3. Проверяем создание сеанса..."
+ssh $username@$ip_address "tmux list-sessions"
+
+# Показываем как подключиться к сеансу
+echo "4. Для подключения к сеансу выполните:"
+echo "   ssh $username@$ip_address"
+echo "   tmux attach-session -t mysession"
+
+# Проверяем работу задачи
+echo "5. Проверяем работу долгосрочной задачи..."
+ssh $username@$ip_address "tail -5 /tmp/long_task.log"
+
+chmod +x tmux_setup.sh
+./tmux_setup.sh
