@@ -1,0 +1,36 @@
+nano bastion_setup.sh
+#!/bin/bash
+
+# Настройка бастион-сервера
+echo "=== Настройка бастион-сервера ==="
+
+# Запрос данных для подключения
+read -p "Введите имя пользователя на бастион-сервере: " bastion_user
+read -p "Введите IP-адрес бастион-сервера: " bastion_ip
+read -p "Введите имя пользователя на целевом сервере: " target_user
+read -p "Введите IP-адрес целевого сервера: " target_ip
+
+# Генерируем ключи если их нет
+echo "1. Проверяем наличие SSH-ключей..."
+if [ ! -f ~/.ssh/id_rsa ]; then
+    ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+fi
+
+# Копируем ключ на бастион-сервер
+echo "2. Копируем ключ на бастион-сервер..."
+ssh-copy-id $bastion_user@$bastion_ip
+
+# Копируем ключ с бастиона на целевой сервер
+echo "3. Копируем ключ на целевой сервер через бастион..."
+ssh $bastion_user@$bastion_ip "ssh-copy-id $target_user@$target_ip"
+
+# Подключаемся к целевому серверу через бастион
+echo "4. Подключаемся к целевому серверу через бастион..."
+ssh -J $bastion_user@$bastion_ip $target_user@$target_ip "echo 'Успешное подключение через бастион-сервер!'"
+
+# Показываем команды для ручного подключения
+echo "5. Команда для подключения через бастион:"
+echo "   ssh -J $bastion_user@$bastion_ip $target_user@$target_ip"
+
+chmod +x bastion_setup.sh
+./bastion_setup.sh

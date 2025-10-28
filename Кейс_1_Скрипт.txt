@@ -1,0 +1,23 @@
+nano setup_ssh.sh
+
+#!/bin/bash
+
+# Установка SSH-сервера
+sudo apt update
+sudo apt install openssh-server -y
+
+# Запуск и настройка автозапуска
+sudo systemctl start ssh
+sudo systemctl enable ssh
+
+# Проверка статуса
+echo "=== Статус SSH-сервера ==="
+sudo systemctl status ssh
+
+echo "=== Проверка порта ==="
+sudo ss -tlnp | grep :22
+
+chmod +x setup_ssh.sh
+./setup_ssh.sh
+
+sudo systemctl status ssh

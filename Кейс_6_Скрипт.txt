@@ -1,0 +1,22 @@
+nano port_forwarding.sh
+
+#!/bin/bash
+
+# Перенаправление портов (Port Forwarding)
+echo "=== Настройка перенаправления портов ==="
+
+# Запрос данных для подключения
+read -p "Введите имя пользователя: " username
+read -p "Введите IP-адрес сервера: " ip_address
+read -p "Введите локальный порт (например: 8080): " local_port
+read -p "Введите удаленный порт (например: 80): " remote_port
+
+# Настраиваем перенаправление портов
+echo "1. Настраиваем перенаправление порта $local_port на $ip_address:$remote_port..."
+echo "Для остановки нажмите Ctrl+C"
+
+# Запускаем перенаправление портов
+ssh -L $local_port:localhost:$remote_port $username@$ip_address
+
+chmod +x port_forwarding.sh
+./port_forwarding.sh

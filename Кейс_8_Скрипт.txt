@@ -1,0 +1,51 @@
+nano ssh_security.sh
+
+#!/bin/bash
+
+# Настройка безопасности SSH
+echo "=== Настройка безопасности SSH ==="
+
+# Создаем резервную копию конфигурации
+echo "1. Создаем резервную копию конфигурации..."
+sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
+
+# Запрос параметров безопасности
+read -p "Введите новый порт для SSH (например: 2222): " ssh_port
+read -p "Введите разрешенные IP-адреса (например: 192.168.1.0/24): " allowed_ips
+
+# Настраиваем новый конфигурационный файл
+echo "2. Настраиваем параметры безопасности..."
+sudo tee /etc/ssh/sshd_config > /dev/null << EOF
+# Безопасная конфигурация SSH
+Port $ssh_port
+Protocol 2
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+AllowUsers *@$allowed_ips
+ClientAliveInterval 300
+ClientAliveCountMax 2
+MaxAuthTries 3
+LoginGraceTime 60
+EOF
+
+# Перезапускаем SSH сервер
+echo "3. Перезапускаем SSH сервер..."
+sudo systemctl restart ssh
+
+# Настраиваем firewall
+echo "4. Настраиваем firewall..."
+sudo ufw allow $ssh_port
+sudo ufw deny 22
+
+# Проверяем статус
+echo "5. Проверяем статус SSH сервера..."
+sudo systemctl status ssh
+
+echo "6. Новый порт SSH: $ssh_port"
+echo "7. Разрешенные IP: $allowed_ips"
+echo "8. Вход по паролю: ЗАПРЕЩЕН"
+echo "9. Вход по ключам: РАЗРЕШЕН"
+
+chmod +x ssh_security.sh
+./ssh_security.sh

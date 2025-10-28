@@ -1,0 +1,37 @@
+nano ssh_config.sh
+
+#!/bin/bash
+
+# Настройка файла конфигурации SSH
+echo "=== Настройка SSH конфигурации ==="
+
+# Создаем папку .ssh если её нет
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+# Создаем файл конфигурации
+echo "1. Создаем файл конфигурации ~/.ssh/config..."
+touch ~/.ssh/config
+chmod 600 ~/.ssh/config
+
+# Запрос данных для подключения
+read -p "Введите имя пользователя: " username
+read -p "Введите IP-адрес сервера: " ip_address
+read -p "Введите алиас для сервера (например: myserver): " alias
+
+# Редактируем файл конфигурации
+echo "2. Редактируем файл конфигурации..."
+cat >> ~/.ssh/config << EOF
+
+Host $alias
+    HostName $ip_address
+    User $username
+    Port 22
+    IdentityFile ~/.ssh/id_rsa
+EOF
+
+echo "3. Подключаемся с использованием алиаса..."
+ssh $alias "echo 'Успешное подключение через алиас $alias!'"
+
+chmod +x ssh_config.sh
+./ssh_config.sh

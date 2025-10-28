@@ -1,0 +1,18 @@
+nano connect_ssh.sh
+#!/bin/bash
+
+# Подключение к удаленному серверу по SSH
+echo "=== Подключение к удаленному серверу ==="
+
+# Запрос данных для подключения
+read -p "Введите имя пользователя: " username
+read -p "Введите IP-адрес сервера: " ip_address
+
+# Подключение по SSH
+echo "Подключаемся к $username@$ip_address..."
+ssh $username@$ip_address
+
+chmod +x connect_ssh.sh
+./connect_ssh.sh
+
+ssh user@192.168.1.180
